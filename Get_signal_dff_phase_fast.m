@@ -11,7 +11,7 @@ nlayer = length(F.sets);            % number of layers in stack
 nframes = size(F.set.frames, 2);    % number of frames in one layer
 f = 1/F.dt * 1000;                  % image acquisition frequency (at which the camera runs)
 Time = [(1/f)*layer:(1/f)*nlayer:(nframes*(1/f)*nlayer)];             % time of experiment sampled at image aquisition frequency
-%Time = [0:(1/f)*nlayer:(nframes*(1/f)*nlayer)-((1/f)*nlayer)];             % time of experiment sampled at image aquisition frequency
+Time_stim = [0:(1/f)*nlayer:(nframes*(1/f)*nlayer)-((1/f)*nlayer)];             % time of experiment sampled at image aquisition frequency
 
 pstim = size(Time, 2) * F.dt*0.001 * length(F.sets) * fstim;
 if mod(nframes/pstim,1)==0
@@ -38,12 +38,12 @@ try
     ax(3) = subplot(3,3,7:8);
     hold(ax(3), 'on');
     plot(Tracking_time, -Tracking_sig, 'r');
-    [Tracking_int] = tracking_interpolate(Time, F);
+    [Tracking_int] = tracking_interpolate(Time_stim, F);
     Tracking_int(Tracking_int==0) = nan;
     Tracking_sig_mean = nanmean(reshape(Tracking_int,[size(Tracking_int,2)/pstim, pstim]),2);
     ax(6) = subplot(3,3,9);
     hold(ax(6), 'on');
-    plot(Time(1:size(Tracking_sig_mean,1)), -(Tracking_sig_mean-min(Tracking_sig_mean)) , 'r');
+    plot(Time_stim(1:size(Tracking_sig_mean,1)), -(Tracking_sig_mean-min(Tracking_sig_mean)) , 'r');
 catch
     warning('No Tracking trace');
 end
@@ -54,15 +54,15 @@ try
     ax(3) = subplot(3,3,7:8);
     plot(Motor_time, Motor_sig, 'b');
     axis([0 600 -20 20]);
-    [Motor_int] = motor_interpolate(Time, F);
+    [Motor_int] = motor_interpolate(Time_stim, F);
     Motor_sig_mean = reshape(Motor_int,[size(Motor_int,2)/pstim, pstim]);
     Motor_sig_mean = Motor_sig_mean(:,2);
     ax(6) = subplot(3,3,9);
-    plot(Time(1:size(Motor_sig_mean,1)), Motor_sig_mean, 'b');
+    plot(Time_stim(1:size(Motor_sig_mean,1)), Motor_sig_mean, 'b');
     ax(5) = subplot(3,3,6);
     hold(ax(5), 'on');
     yyaxis right
-    plot(Time(1:size(Motor_sig_mean,1)), Motor_sig_mean, '-r');
+    plot(Time_stim(1:size(Motor_sig_mean,1)), Motor_sig_mean, '-r');
 catch
     warning('No Motor trace');
 end
