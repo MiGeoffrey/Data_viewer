@@ -80,9 +80,15 @@ end
 try
     [Motor_sig, Motor_time] = motor_signal(F);
     ax(3) = subplot(Lin,Col,Lin_first*Col-2:Lin_first*Col-1);
-    plot(Motor_time, Motor_sig, 'k');
-    axis([0 600 -20 20]);
     [Motor_int] = motor_interpolate(Time_stim, F);
+    if data_half==1
+        plot(Time_stim(1:size(Time_stim,2)/2), Motor_int(1:size(Time_stim,2)/2), 'k');
+    elseif data_half==2
+        plot(Time_stim((size(Time_stim,2)/2)+1:end), Motor_int((size(Time_stim,2)/2)+1:end), 'k');
+    else
+        plot(Time_stim, Motor_int, 'k');
+    end
+    ylabel(ax(3),'Amplitude [°]')
     Motor_sig_mean = reshape(Motor_int,[size(Motor_int,2)/pstim, pstim]);
     Motor_sig_mean = Motor_sig_mean(:,2);
     ax(6) = subplot(Lin,Col,Lin_first*Col);
@@ -147,17 +153,24 @@ while count <= N
     ax(4) = subplot(Lin,Col,(Col*Lin_first+((count-1)*3)+1):(Col*Lin_first+((count-1)*3)+2));
     plot(Time(1:size(Data_ROI,2)), Data_ROI,'color',colours(count,:),'LineWidth',1) % Plot DFF of ROI (first point is shifted to zero)
     ax(5) = subplot(Lin,Col,(Col*Lin_first+((count-1)*3)+3));
+    ylabel(ax(4),'DFF')
     yyaxis left
     plot(Time(1:size(Data_ROI_mean,1)),Data_ROI_mean, 'color',colours(count,:),'LineWidth',1)
     set(ax(5),'ycolor',colours(count,:))
+    ylabel(ax(5),'DFF')
+    set(ax(5),'ycolor','k')
     yyaxis right
     plot(Time_stim(1:size(Motor_sig_mean,1)), Motor_sig_mean, 'k');
     set(ax(5),'ycolor','k')
-    
+
     if count == N
-        ylabel('Tme [s]')
+        xlabel(ax(4),'Time [s]')
+        xlabel(ax(5),'Time [s]')
+        %grid(ax(3:6), 'on')
     else
-        set(ax(5),'XTick',[])
+        set(ax(3),'XTick',[])
+        set(ax(6),'XTick',[])
+        set(ax(4),'XTick',[])
         set(ax(5),'XTick',[])
     end
     
